@@ -1,3 +1,4 @@
+
 //* 202131230 정윤혁
 //* 2022.03.26 Sat
 //* Source Code
@@ -92,6 +93,8 @@ void _20220326_03()
     */
 
     const int c2 = 1; //* OK
+
+    cout << "ERROR\nERROR\nOK" << endl;
 }
 
 //* 202131230 정윤혁
@@ -109,6 +112,8 @@ void _20220326_04()
     /*
     arr[0] = 7;                    //! ERROR
     */
+
+    cout << "ERROR\nOK\nERROR" << endl;
 }
 
 //* 202131230 정윤혁
@@ -126,6 +131,8 @@ void _20220326_05()
      */
 
     a = 2; //* OK
+
+    cout << "OK\nERROR\nOK" << endl;
 }
 
 //* 202131230 정윤혁
@@ -148,6 +155,7 @@ void _20220326_07()
     auto a; //! COMPILE ERROR
     a = 1;
     */
+    cout << "COMPILE ERROR" << endl;
 }
 
 //* 202131230 정윤혁
@@ -257,6 +265,8 @@ void _20220326_12()
     /*
     a++ = 1; //! ERROR : R-Value
     */
+
+    cout << "OK : L-Value\nERROR : R-Value" << endl;
 }
 
 //* 202131230 정윤혁
@@ -303,6 +313,8 @@ void _20220326_15()
     {
         cout << "main" << endl;
     }
+
+    cout << "Func() is 1, Print Noting" << endl;
 }
 
 //* 202131230 정윤혁
