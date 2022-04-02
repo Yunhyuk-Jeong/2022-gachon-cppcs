@@ -1,3 +1,7 @@
+//* 202131230 정윤혁
+//* 2022.04.02 Sat
+//* Source Code
+
 #include "220402 Deadlock.h"
 
 int a;
