@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 
 namespace 배열_이차원배열
 {
@@ -7,7 +6,6 @@ namespace 배열_이차원배열
     {
         static void Main(string[] args)
         {
-
             int[,] arr = { { 10, 20 }, { 30, 40 } };
             for (int i = 0; i < 2; i++)
             {
@@ -18,7 +16,6 @@ namespace 배열_이차원배열
                 Console.WriteLine();
             }
             Console.WriteLine();
-
 
             int[,] scores = new int[2, 2];
             scores[0, 0] = 10;
@@ -35,9 +32,6 @@ namespace 배열_이차원배열
             }
             Console.WriteLine();
 
-
-
-
             int[] arr1 = { 100, 90, 80 };
             Console.WriteLine("배열의 차수: {0}", arr1.Rank);
             for (int i = 0; i < arr1.Length; i++)
@@ -46,14 +40,7 @@ namespace 배열_이차원배열
             }
             Console.WriteLine();
 
-
             int[,] arr2 = new int[,] { { 10, 20, 30 }, { 40, 50, 60 } };
-
-
-
-
-
-
 
             Console.WriteLine("배열의 차수: {0}", arr2.Rank);
             for (int i = 0; i < arr2.GetLength(0); i++)

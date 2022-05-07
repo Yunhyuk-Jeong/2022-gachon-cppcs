@@ -10,9 +10,9 @@
         kor[1] = 90;
         kor[2] = 80;
 
-        sum = kor[0] + kor[1] + kor[2];     
-        avg = sum / (float)3.0;             
+        sum = kor[0] + kor[1] + kor[2];
+        avg = sum / (float)3.0;
 
-        System.Console.WriteLine($"총점: {sum}, 평균: {avg:0.00}");                             
+        System.Console.WriteLine($"총점: {sum}, 평균: {avg:0.00}");
     }
 }

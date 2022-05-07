@@ -1,12 +1,9 @@
-﻿
-using System;
+﻿using System;
 
 public class 배열반복
 {
     public static void Main()
     {
-        
-        
         string s = "안녕하세요.";
         Console.WriteLine(s);
 
@@ -16,7 +13,7 @@ public class 배열반복
         }
         Console.WriteLine();
 
-        
+
         foreach (char c in s)
         {
             Console.Write("{0}\t", c);
