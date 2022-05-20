@@ -24,17 +24,38 @@ void PrintClear()
     for (int i = 2; i < 27; i++)
     {
         Gotoxy_(i, 2);
-        if (i == 2 || i == 26)
-            cout << "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■";
+        if (i == 2)
+            cout << "┌─────────────────────────────────────────────────────────────────────────────────────────┐"
+                 << endl;
+        else if (i == 26)
+            cout << "└─────────────────────────────────────────────────────────────────────────────────────────┘";
         else
-            cout << "■                                                                                        ■";
+            cout << "│                                                                                         │";
+    }
+}
+
+void PrintEnter(int x, int y)
+{
+    if (x != -1 && y != -1)
+    {
+        Gotoxy_(x, y);
+        cout << "◀ Enter Here";
+    }
+}
+
+void RemoveEnter(int x, int y)
+{
+    if (x != -1 && y != -1)
+    {
+        Gotoxy_(x, y);
+        cout << "             ";
     }
 }
 
 void PrintMenu()
 {
     int x = 6;
-    int yText = 21;
+    int yText = 43;
 
     TextColor(0xA);
 
@@ -42,24 +63,23 @@ void PrintMenu()
 
     PrintClear();
 
-    Gotoxy_(x, yText);
-    cout << "1. 모든 도서찾기";
+    Gotoxy(x, yText);
+    cout << "1. Book List";
     x += 3;
-    Gotoxy_(x, yText);
-    cout << "2. 도서 등록하기";
+    Gotoxy(x, yText);
+    cout << "2. Add Book";
     x += 3;
-    Gotoxy_(x, yText);
-    cout << "3. 도서 검색하기";
+    Gotoxy(x, yText);
+    cout << "3. Search Book";
     x += 3;
-    Gotoxy_(x, yText);
-    cout << "4. 도서 수정하기";
+    Gotoxy(x, yText);
+    cout << "4. Update Book";
     x += 3;
-    Gotoxy_(x, yText);
-    cout << "5. 도서 삭제하기";
+    Gotoxy(x, yText);
+    cout << "5. Delete Book";
     x += 4;
-    Gotoxy_(x, yText);
-    cout << "0. 이제 종료하기";
-    Gotoxy_(9, yText);
+    Gotoxy(x, yText);
+    cout << "0. EXIT";
 }
 
 Menu GetBookMenu()
@@ -97,63 +117,100 @@ Menu GetBookMenu()
     return menu;
 }
 
-void PrintList(MadangBook *pm, int cnt)
+void PrintList()
 {
-    PrintClear();
-    Gotoxy_(3, 2);
-    cout << "■  No  ■            Book Name             ■        Publisher         ■     Price      ■";
-    Gotoxy_(4, 2);
-    cout << "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■";
+    Gotoxy(3, 5);
+    cout << "   No   │            Book Name              │        Publisher        │       Price      ";
+    Gotoxy(4, 5);
+    cout << "────────┼───────────────────────────────────┼─────────────────────────┼──────────────────" << endl;
     for (int i = 5; i < 26; i++)
     {
-        Gotoxy_(i, 2);
-        cout << "■      ■                                  ■                          ■                ■";
+        Gotoxy(i, 5);
+        cout << "        │                                   │                         │                  ";
     }
-    Gotoxy_(28, 2);
+    Gotoxy_(27, 2);
     cout << "(Page Move) ◀  ▶ | (Quit) Q";
+}
 
+void List(MadangBook *pm, int cnt)
+{
     //! 정상 출력 한계는 10개, 다음페이지 기능 구현 예정
+    PrintClear();
+    PrintList();
+
+    int page = 0;
+    int pageMax = 0;
+    if (cnt != 1)
+        pageMax = (cnt - 1) / 10;
 
     while (true)
     {
+        bool quit = false;
         int x = 6;
-        for (int i = 1; i <= cnt; i++)
+        for (int i = 1; i <= 10; i++)
         {
+            Gotoxy_(27, 40);
+            cout << "Page "<< setw(3) << (page + 1) << " / " << (pageMax + 1);
+
+            if ((i - 1) + (page * 10) > cnt - 1)
+                break;
+
             int y = 4;
+
             if (pm[i - 1].GetName().empty())
                 break;
 
             Gotoxy(x, y * 2 - 1);
-            cout << pm[i - 1].GetNum();
+            cout << pm[(i - 1) + (page * 10)].GetNum();
             y += 4;
             Gotoxy(x, y * 2 - 2);
-            cout << " " << pm[i - 1].GetName();
+            cout << " " << pm[(i - 1) + (page * 10)].GetName();
             y += 18;
             Gotoxy(x, y * 2 - 2);
-            cout << " " << pm[i - 1].GetPublisher();
+            cout << " " << pm[(i - 1) + (page * 10)].GetPublisher();
             y += 14;
             Gotoxy(x, y * 2 - 2);
-            cout << setw(11) << pm[i - 1].GetPrice() << " KRW";
+            cout << setw(11) << pm[(i - 1) + (page * 10)].GetPrice() << " KRW";
             x += 2;
         }
 
-        int command = GetCommand();
-        if (command == 'q' || command == 'Q')
+        while (true)
+        {
+            int command = GetCommand();
+            if (command == 75) //* Left Arrow
+            {
+                if (page == 0)
+                    continue;
+                page--;
+                PrintClear();
+                PrintList();
+                break;
+            }
+            if (command == 77) //* Right Arrow
+            {
+                if (page == pageMax)
+                    continue;
+                page++;
+                PrintClear();
+                PrintList();
+                break;
+            }
+            if (command == 'q' || command == 'Q')
+            {
+                quit = true;
+                break;
+            }
+        }
+
+        if (quit)
             break;
     }
 
     delete[] pm;
 }
 
-MadangBook Add()
+void PrintAddBefore()
 {
-    int num;
-    stringstream numSs;
-    string numString;
-    string name;
-    string publisher;
-    string price;
-
     PrintClear();
 
     int x = 5;
@@ -190,51 +247,64 @@ MadangBook Add()
     Gotoxy_(x++, y);
     cout << "└─────────────────────────────┘";
 
-    Gotoxy_(6, 33);
-    cout << "◀ Enter Here";
-    Gotoxy_(6, y + 3);
-    cin >> numString;
-    numSs << numString;
-    numSs >> num;
-
-    Gotoxy_(6, 33);
-    cout << "             ";
-    Gotoxy_(11, 33);
-    cout << "◀ Enter Here";
-    Gotoxy_(11, y + 3);
-    cin >> name;
-
-    Gotoxy_(11, 33);
-    cout << "             ";
-    Gotoxy_(16, 33);
-    cout << "◀ Enter Here";
-    Gotoxy_(16, y + 3);
-    cin >> publisher;
-
-    Gotoxy_(16, 33);
-    cout << "             ";
-    Gotoxy_(21, 33);
-    cout << "◀ Enter Here";
-    Gotoxy_(21, y + 3);
-    cin >> price;
-
-    Gotoxy_(21, 33);
-    cout << "             ";
-
-    MadangBook m(num, name, publisher, price);
-    string line;
-
-    getline(cin, line);
-
-    return m;
+    Gotoxy_(27, 2);
+    cout << "(Add Continue) S | (Quit) Q";
 }
 
-int Search()
+void PrintAddAfter()
+{
+    for (int i = 0; i < 14; i++)
+    {
+        Gotoxy_(7 + i, 11);
+        if (i == 0)
+            cout << "┌─────────────────────────────────────────────────────┐";
+        else if (i == 13)
+            cout << "└─────────────────────────────────────────────────────┘";
+        else
+            cout << "│                                                     │";
+    }
+}
+
+MadangBook Add()
 {
     int num;
     stringstream numSs;
     string numString;
+    string name;
+    string publisher;
+    string price;
 
+    for (int i = 0; i < 4; i++)
+    {
+        PrintEnter(i * 5 + 6, 33);
+        Gotoxy_(i * 5 + 6, 20);
+        switch (i)
+        {
+        case 0:
+            cin >> numString;
+            numSs << numString;
+            numSs >> num;
+            break;
+        case 1:
+            cin >> name;
+            break;
+        case 2:
+            cin >> publisher;
+            break;
+        case 3:
+            cin >> price;
+            break;
+        }
+        RemoveEnter(i * 5 + 6, 33);
+    }
+
+    MadangBook m(num, name, publisher, price);
+
+    return m;
+}
+
+void PrintSearchBefore(int cnt)
+{
     int x = 5;
     int y = 17;
 
@@ -245,17 +315,32 @@ int Search()
     Gotoxy_(x++, y);
     cout << "└─────────────────────────────┘";
     x += 2;
-    Gotoxy_(x++, 2);
-    cout << "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■" << endl;
-    Gotoxy_(x++, 2);
-    cout << "■  No  ■            Book Name             ■        Publisher         ■     Price      ■";
-    Gotoxy_(x++, 2);
-    cout << "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■";
+    Gotoxy(x++, 5);
+    cout << "────────┬───────────────────────────────────┬─────────────────────────┬──────────────────" << endl;
+    Gotoxy(x++, 5);
+    cout << "   No   │            Book Name              │        Publisher        │       Price      ";
+    Gotoxy(x++, 5);
+    cout << "────────┼───────────────────────────────────┼─────────────────────────┼──────────────────" << endl;
+    if (cnt == 0)
+    {
+        for (int i = 0; i < 13; i++)
+        {
+            Gotoxy(x + i, 5);
+            cout << "        │                                   │                         │                 ";
+        }
+    }
 
-    Gotoxy_(28, 2);
+    Gotoxy_(27, 2);
     cout << "(Search Continue) S | (Quit) Q";
 
     Gotoxy_(x - 7, y + 4);
+}
+
+int Search()
+{
+    int num;
+    stringstream numSs;
+    string numString;
 
     cin >> numString;
     numSs << numString;
@@ -264,20 +349,20 @@ int Search()
     return num;
 }
 
-void PrintBook(MadangBook &m, int cnt)
+void PrintSearchAfter(MadangBook &m, int cnt)
 {
     int x = (cnt * 2) + 14;
     int y = 4;
 
-    if (cnt == -2)
+    if (cnt == -2 || cnt == -1)
         x--;
 
     if (cnt == 5)
     {
         Gotoxy_(6, 18);
         cout << "■■■■List is FULL■■■■";
-        Gotoxy_(28, 2);
-        cout << "(Quit) Q                      ";
+        Gotoxy_(27, 2);
+        cout << "(Restart) R | (Quit) Q                      ";
     }
 
     Gotoxy(x, y * 2 - 1);
@@ -294,18 +379,10 @@ void PrintBook(MadangBook &m, int cnt)
     x += 2;
 }
 
-MadangBook UpdateInfo()
+void PrintUpdateBefore()
 {
-    MadangBookIO bio("db.dat");
-
-    int num;
-    stringstream numSs;
-    string numString;
-
     int x = 4;
     int y = 17;
-
-    string name, publisher, price;
 
     Gotoxy_(x++, y);
     cout << "┌──────────  NUMBER ──────────┐";
@@ -316,14 +393,14 @@ MadangBook UpdateInfo()
     Gotoxy_(x++, y);
     cout << "└─────────────────────────────┘";
     x += 1;
-    Gotoxy_(x++, 2);
-    cout << "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■" << endl;
-    Gotoxy_(x++, 2);
-    cout << "■      ■                                  ■                          ■                ■";
-    Gotoxy_(x++, 2);
-    cout << "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■";
+    Gotoxy(x++, 5);
+    cout << "────────┬───────────────────────────────────┬─────────────────────────┬──────────────────" << endl;
+    Gotoxy(x++, 5);
+    cout << "        │                                   │                         │                  ";
+    Gotoxy(x++, 5);
+    cout << "────────┴───────────────────────────────────┴─────────────────────────┴──────────────────" << endl;
 
-    Gotoxy_(28, 2);
+    Gotoxy_(27, 2);
     cout << "(Change Continue) S | (Quit) Q";
 
     x++;
@@ -352,76 +429,176 @@ MadangBook UpdateInfo()
     Gotoxy_(x++, y);
     cout << "└─────────────────────────────┘";
 
-    Gotoxy_(5, 33);
-    cout << "◀ Enter Here";
+    PrintEnter(5, 33);
+}
 
-    Gotoxy_(5, y + 4);
+int UpdateGetNum()
+{
+    int num;
+    stringstream numSs;
+    string numString;
+
+    Gotoxy_(5, 21);
     cin >> numString;
     numSs << numString;
     numSs >> num;
 
-    MadangBook m = bio.Search(num);
-    PrintBook(m, -2);
-
-    Gotoxy_(5, 33);
-    cout << "             ";
-    Gotoxy_(13, 33);
-    cout << "◀ Enter Here";
-    Gotoxy_(13, y + 3);
-    cin >> name;
-
-    Gotoxy_(13, 33);
-    cout << "             ";
-    Gotoxy_(18, 33);
-    cout << "◀ Enter Here";
-    Gotoxy_(18, y + 3);
-    cin >> publisher;
-
-    Gotoxy_(18, 33);
-    cout << "             ";
-    Gotoxy_(23, 33);
-    cout << "◀ Enter Here";
-    Gotoxy_(23, y + 3);
-    cin >> price;
-
-    Gotoxy_(23, 33);
-    cout << "             ";
-
-    MadangBook m2;
-
-    m2.SetNum(num);
-    m2.SetName(name);
-    m2.SetPublisher(publisher);
-    m2.SetPrice(price);
-
-    return m2;
+    return num;
 }
 
-int GetDelName()
+MadangBook Update(int num)
 {
-    cout << "\n삭제할 책의 번호 : ";
+    MadangBookIO bio("db.dat");
 
+    string name, publisher, price;
+
+    RemoveEnter(5, 33);
+
+    for (int i = 0; i < 3; i++)
+    {
+        PrintEnter(i * 5 + 13, 33);
+        Gotoxy_(i * 5 + 13, 21);
+        switch (i)
+        {
+        case 0:
+            cin >> name;
+            break;
+        case 1:
+            cin >> publisher;
+            break;
+        case 2:
+            cin >> price;
+            break;
+        }
+        RemoveEnter(i * 5 + 13, 33);
+    }
+
+    MadangBook m;
+
+    m.SetNum(num);
+    m.SetName(name);
+    m.SetPublisher(publisher);
+    m.SetPrice(price);
+
+    return m;
+}
+
+void PrintUpdateAfter()
+{
+    for (int i = 0; i < 13; i++)
+    {
+        Gotoxy_(12 + i, 11);
+        if (i == 0)
+            cout << "┌─────────────────────────────────────────────────────┐";
+        else if (i == 12)
+            cout << "└─────────────────────────────────────────────────────┘";
+        else
+            cout << "│                                                     │";
+    }
+    Gotoxy(16, 43);
+    cout << "Change SUCCESS";
+    Gotoxy(18, 39);
+    cout << "Press 'S' to Continue";
+    Gotoxy(19, 41);
+    cout << "Press 'Q' to EXIT";
+}
+
+void PrintDelBefore()
+{
+    int x = 5;
+    int y = 17;
+
+    Gotoxy_(x++, y);
+    cout << "┌──────────  NUMBER ──────────┐";
+    PrintEnter(x, 33);
+    Gotoxy_(x++, y);
+    cout << "│                             │";
+    Gotoxy_(x++, y);
+    cout << "└─────────────────────────────┘";
+    x += 2;
+    Gotoxy(x++, 5);
+    cout << "────────┬───────────────────────────────────┬─────────────────────────┬──────────────────" << endl;
+    Gotoxy(x++, 5);
+    cout << "        │                                   │                         │                  ";
+    Gotoxy(x++, 5);
+    cout << "────────┴───────────────────────────────────┴─────────────────────────┴──────────────────";
+    Gotoxy_(27, 2);
+    cout << "(Delete Continue) S | (Quit) Q";
+}
+
+int Del()
+{
     int num;
+    stringstream numSs;
+    string numString;
 
-    cin >> num;
+    Gotoxy_(6, 20);
+
+    cin >> numString;
+    numSs << numString;
+    numSs >> num;
 
     return num;
 }
 
+bool DelCheck()
+{
+    for (int i = 0; i < 11; i++)
+    {
+        Gotoxy_(14 + i, 11);
+        if (i == 0)
+            cout << "┌─────────────────────────────────────────────────────┐";
+        else if (i == 10)
+            cout << "└─────────────────────────────────────────────────────┘";
+        else
+            cout << "│                                                     │";
+    }
+    Gotoxy(18, 41);
+    cout << "Are you Delete it?";
+    Gotoxy(20, 47);
+    cout << "Y / N";
+
+    while (true)
+    {
+        int command = GetCommand();
+        if (command == 'y' || command == 'Y')
+            return true;
+        if (command == 'n' || command == 'N')
+            return false;
+    }
+}
+
+void PrintDelAfter(bool chk)
+{
+    Gotoxy(18, 41);
+    cout << "                   ";
+    Gotoxy(20, 47);
+    cout << "      ";
+
+    Gotoxy(18, 43);
+    if (chk)
+        cout << "Delete Complete";
+    else
+        cout << "Delete Cancled";
+
+    Gotoxy(20, 36);
+    cout << "Continue to 'S' | Exit to 'Q'";
+}
+
 int main()
 {
-    SetWindow(100, 30);
+    SetWindow(98, 29);
     RemoveScrollbar();
     SetCursorType(NOCURSOR);
 
     MadangBookIO bio("db.dat");
 
-    bool go = true, saved = false;
+    bool run = true, saved = false;
 
     MadangBook *pm = 0;
     MadangBook book;
 
-    while (go)
+    while (run)
     {
         PrintMenu();
 
@@ -431,15 +608,32 @@ int main()
         {
         case LIST:
             pm = bio.List();
-            PrintList(pm, bio.curr_cnt);
+            List(pm, bio.curr_cnt);
             break;
         case ADD:
-            book = Add();
-            saved = bio.Add(book);
-            Gotoxy_(24, 20);
-            cout << "= Add Book " << (saved ? "SUCCESS" : "  FAIL ") << " =";
-            cout << endl;
-            GetCommand();
+            for (int i = 0;; i++)
+            {
+                PrintAddBefore();
+                book = Add();
+                saved = bio.Add(book);
+                PrintAddAfter();
+                Gotoxy(13, 40);
+                cout << "= Add Book " << (saved ? "SUCCESS" : "  FAIL ") << " =";
+
+                while (true)
+                {
+                    int command = GetCommand();
+                    if (command == 's' || command == 'S')
+                        break;
+                    if (command == 'q' || command == 'Q')
+                    {
+                        i = -10;
+                        break;
+                    }
+                }
+                if (i == -10)
+                    break;
+            }
             break;
         case SEARCH:
             PrintClear();
@@ -449,8 +643,9 @@ int main()
                 {
                     try
                     {
+                        PrintSearchBefore(i);
                         MadangBook m = bio.Search(Search());
-                        PrintBook(m, i);
+                        PrintSearchAfter(m, i);
                     }
                     catch (exception &e)
                     {
@@ -470,30 +665,97 @@ int main()
                         i = -10;
                         break;
                     }
+                    if (i >= 5 && (command == 'r' || command == 'R'))
+                    {
+                        i = -1;
+                        PrintClear();
+                        break;
+                    }
                 }
                 if (i == -10)
                     break;
             }
             break;
         case UPDATE:
-            PrintClear();
-            book = UpdateInfo();
-            bio.Update(book);
-            GetCommand();
+            for (int i = 0;; i++)
+            {
+                try
+                {
+                    PrintClear();
+                    PrintUpdateBefore();
+                    MadangBook m = bio.Search(UpdateGetNum());
+                    PrintSearchAfter(m, -2);
+                    book = Update(m.GetNum());
+                    bio.Update(book);
+                    PrintUpdateAfter();
+                }
+                catch (exception &e)
+                {
+                    Gotoxy_(5, 18);
+                    cerr << e.what() << endl;
+                }
+
+                while (true)
+                {
+                    int command = GetCommand();
+                    if (command == 's' || command == 'S')
+                        break;
+                    if (command == 'q' || command == 'Q')
+                    {
+                        i = -10;
+                        break;
+                    }
+                }
+                if (i == -10)
+                    break;
+            }
             break;
         case DEL:
-            bio.Del(GetDelName());
-            GetCommand();
+            for (int i = 0;; i++)
+            {
+                try
+                {
+                    PrintClear();
+                    PrintDelBefore();
+                    MadangBook m = bio.Search(Del());
+                    PrintSearchAfter(m, -1);
+                    if (DelCheck())
+                    {
+                        bio.Del(m.GetNum());
+                        PrintDelAfter(true);
+                    }
+                    else
+                        PrintDelAfter(false);
+                }
+                catch (exception &e)
+                {
+                    Gotoxy_(6, 18);
+                    cerr << e.what() << endl;
+                }
+
+                while (true)
+                {
+                    int command = GetCommand();
+                    if (command == 's' || command == 'S')
+                        break;
+                    if (command == 'q' || command == 'Q')
+                    {
+                        i = -10;
+                        break;
+                    }
+                }
+                if (i == -10)
+                    break;
+            }
             break;
+
         case EXIT:
-            go = false;
+            run = false;
             break;
         case NONE:
             break;
         }
     }
-
-    cout << "\n프로그램 종료...." << endl;
 
     return 0;
 }
