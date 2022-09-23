@@ -3,7 +3,6 @@
 using namespace std;
 
 class MadangBook
-
 {
     int num;
     string name;
